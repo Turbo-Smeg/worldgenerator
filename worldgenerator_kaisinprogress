@@ -3,10 +3,11 @@ from scipy.spatial import Voronoi # Pour les Voronoi diagrams utilisé pour les 
 import pygame # Interface qui affiche la carte, on peut faire plein dautres choses avec
 import noise # Pour le Bruit de Perlin
 import tkinter as tk # Interface graphique (GUI) pour faire entrer le "seed"
-from tkinter import simpledialog
+from tkinter import simpledialog, messagebox
 import sqlite3
 import os
 import hashlib
+from PIL import Image
 
 rel_directory=os.path.dirname(__file__)
 filename= 'map_seeds.db'
@@ -204,6 +205,16 @@ CELL_SIZE = 3 # La taille des cellules Voronoi. Plus petites taille = plus de bi
 seed = get_seed()
 biomes, rain_intensity, snow_intensity = generate_world(seed, WORLD_SIZE_X, WORLD_SIZE_Y)
 
+#Sauvegarder la carte dans un format choisi 
+image = Image.fromarray(biomes.astype(np.uint8))
+def save_map(biomes, file_format):
+    save_dir = os.path.dirname(__file__)
+    file_path = os.path.join(save_dir, "map." + file_format.lower())
+    biomes_landscape = np.transpose(biomes, axes=(1, 0, 2))
+    image = Image.fromarray(biomes_landscape.astype(np.uint8))
+    image.save(file_path)
+    messagebox.showinfo("Map Saved", f"Map saved successfully as map.{file_format}")
+
 # Initialiser Pygame
 pygame.init()
 screen = pygame.display.set_mode((WORLD_SIZE_X * CELL_SIZE, WORLD_SIZE_Y * CELL_SIZE))
@@ -211,23 +222,19 @@ pygame.display.set_caption("Générateur de Carte 4.0")
 
 # Main loop
 running = True
+# Dessiner la carte
+screen.fill((255, 255, 255))
+draw_world(screen, biomes, rain_intensity, snow_intensity, CELL_SIZE)
+pygame.display.flip()
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-
-    # Dessiner la carte
-    screen.fill((255, 255, 255))
-    draw_world(screen, biomes, rain_intensity, snow_intensity, CELL_SIZE)
-    pygame.display.flip()
-
-#Sauvegarder la carte dans un format choisi 
-pygame.image.save(screen, "map.png")
-pygame.image.save(screen, "map.jpg")  # You can specify the image quality as the third argument
-pygame.image.save(screen, "map.bmp")  # Bitmap format
-pygame.image.save(screen, "map.tif")  # TIFF format
-pygame.image.save(screen, "map.psd")
-pygame.image.save(screen, "map.pdf")
+            choice = messagebox.askyesno("Save Map", "Do you want to save the current map?")
+            if choice:
+                file_format = simpledialog.askstring("Choose File Format", "Enter the file format (PNG, JPG, etc.):")
+                if file_format:
+                    save_map(biomes, file_format)
 
 # Quit Pygame
 pygame.quit()
