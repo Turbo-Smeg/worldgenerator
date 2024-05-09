@@ -222,12 +222,12 @@ while running:
     pygame.display.flip()
 
 #Sauvegarder la carte dans un format choisi 
-pygame.image.save(map_surface, "map.png")
-pygame.image.save(map_surface, "map.jpg")  # You can specify the image quality as the third argument
-pygame.image.save(map_surface, "map.bmp")  # Bitmap format
-pygame.image.save(map_surface, "map.tif")  # TIFF format
-pygame.image.save(map_surface, "map.psd")
-pygame.image.save(map_surface, "map.pdf")
+pygame.image.save(screen, "map.png")
+pygame.image.save(screen, "map.jpg")  # You can specify the image quality as the third argument
+pygame.image.save(screen, "map.bmp")  # Bitmap format
+pygame.image.save(screen, "map.tif")  # TIFF format
+pygame.image.save(screen, "map.psd")
+pygame.image.save(screen, "map.pdf")
 
 # Quit Pygame
 pygame.quit()
