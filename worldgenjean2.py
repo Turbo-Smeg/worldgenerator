@@ -76,8 +76,42 @@ def show_loading_screen(screen):
         # Simulation d'une attente entre chaque mise à jour (à remplacer par le vrai chargement)
         pygame.time.wait(500)  # Attendre 500 millisecondes entre chaque mise à jour
 
+def show_map_generator():
+    def on_generate_map():
+        # Récupérer les valeurs saisies par l'utilisateur
+        width = int(width_entry.get())
+        height = int(height_entry.get())
+        humidity = humidity_scale.get()
 
+        # Fermer la fenêtre
+        root.destroy()
 
+        # Retourner les valeurs récupérées
+        return width, height, humidity
+
+    root = tk.Tk()
+    root.title("Map Generator")
+
+    # Créer les widgets pour chaque paramètre de personnalisation
+    width_label = ttk.Label(root, text="Map Width:")
+    width_label.grid(row=0, column=0, padx=5, pady=5)
+    width_entry = ttk.Entry(root)
+    width_entry.grid(row=0, column=1, padx=5, pady=5)
+
+    height_label = ttk.Label(root, text="Map Height:")
+    height_label.grid(row=1, column=0, padx=5, pady=5)
+    height_entry = ttk.Entry(root)
+    height_entry.grid(row=1, column=1, padx=5, pady=5)
+
+    humidity_label = ttk.Label(root, text="Humidity:")
+    humidity_label.grid(row=2, column=0, padx=5, pady=5)
+    humidity_scale = ttk.Scale(root, from_=0, to=100)
+    humidity_scale.grid(row=2, column=1, padx=5, pady=5)
+
+    generate_button = ttk.Button(root, text="Generate Map", command=root.destroy)
+    generate_button.grid(row=3, columnspan=2, padx=5, pady=5)
+
+    root.mainloop()
 
 
 # Fonction pr generer une map de bruit d'ambiance. (Bruit perlin)
@@ -249,10 +283,13 @@ def save_map(biomes, file_format):
     image.save(file_path)
     messagebox.showinfo("Map Saved", f"Map saved successfully as map.{file_format}")
 
+# Main loop
 initialize_database()  # Ensure the database is initialized before saving the seed
 # Definir les couleurs pour la météo
 WHITE = (200, 200, 255) # Neige grise un peu
 BLUE = (0, 0, 255) # Pluie bleu foncé
+
+show_map_generator()
 
 WORLD_SIZE_X = 450 # En nombre de pixel
 WORLD_SIZE_Y = 250
@@ -268,10 +305,8 @@ image = Image.fromarray(biomes.astype(np.uint8))
 
 pygame.display.set_caption("Générateur de Carte 4.0")
 
-# Main loop
+
 running = True
-# Dessiner la carte
-screen.fill((255, 255, 255))
 pygame.display.flip()
 draw_world(screen, biomes, rain_intensity, snow_intensity, CELL_SIZE)
 pygame.display.flip()
