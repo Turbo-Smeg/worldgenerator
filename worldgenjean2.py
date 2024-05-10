@@ -65,14 +65,11 @@ def show_loading_screen(screen):
         screen.fill((255, 255, 255))
         screen.blit(loading_text, loading_rect)
         pygame.display.flip()
-
         # Mise à jour de l'index du point pour afficher le suivant
         dot_index = (dot_index + 1) % len(dots)
-
         # Condition de fin de chargement (simulée ici)
         if dot_index == len(dots) - 1:  # Lorsque tous les points ont été affichés
             loading_complete = True
-
         # Simulation d'une attente entre chaque mise à jour (à remplacer par le vrai chargement)
         pygame.time.wait(500)  # Attendre 500 millisecondes entre chaque mise à jour
 
@@ -82,12 +79,13 @@ def show_map_generator():
         width = int(width_entry.get())
         height = int(height_entry.get())
         humidity = humidity_scale.get()
+        population = population_scale.get()
 
         # Fermer la fenêtre
         root.destroy()
 
         # Retourner les valeurs récupérées
-        return width, height, humidity
+        return width, height, humidity, population
 
     root = tk.Tk()
     root.title("Map Generator")
@@ -108,8 +106,14 @@ def show_map_generator():
     humidity_scale = ttk.Scale(root, from_=0, to=100)
     humidity_scale.grid(row=2, column=1, padx=5, pady=5)
 
+    population_label = ttk.Label(root, text="Population:")
+    population_label.grid(row=3, column=0, padx=5, pady=5)
+    population_scale = ttk.Scale(root, from_=0, to=100)
+    population_scale.grid(row=3, column=1, padx=5, pady=5)
+
+
     generate_button = ttk.Button(root, text="Generate Map", command=root.destroy)
-    generate_button.grid(row=3, columnspan=2, padx=5, pady=5)
+    generate_button.grid(row=4, columnspan=2, padx=5, pady=5)
 
     root.mainloop()
 
@@ -299,13 +303,9 @@ seed = get_seed()
 screen = pygame.display.set_mode((WORLD_SIZE_X * CELL_SIZE, WORLD_SIZE_Y * CELL_SIZE))
 show_loading_screen(screen)
 biomes, rain_intensity, snow_intensity = generate_world(seed, WORLD_SIZE_X, WORLD_SIZE_Y)
-
 #Sauvegarder la carte dans un format choisi 
 image = Image.fromarray(biomes.astype(np.uint8))
-
 pygame.display.set_caption("Générateur de Carte 4.0")
-
-
 running = True
 pygame.display.flip()
 draw_world(screen, biomes, rain_intensity, snow_intensity, CELL_SIZE)
