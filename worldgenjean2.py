@@ -74,48 +74,39 @@ def show_loading_screen(screen):
         pygame.time.wait(500)  # Attendre 500 millisecondes entre chaque mise à jour
 
 def show_map_generator():
-    def on_generate_map():
-        # Récupérer les valeurs saisies par l'utilisateur
-        width = int(width_entry.get())
-        height = int(height_entry.get())
-        humidity = humidity_scale.get()
-        population = population_scale.get()
+    def on_generate_map(scale_smooth):
+        if root.winfo_exists():  # Vérifier si la fenêtre existe encore
+            # Mettre à jour les valeurs dans la liste
+            scale_smooth[0] = int(scaleu_entry.get())
+            scale_smooth[1] = int(smooth_entry.get())
 
-        # Fermer la fenêtre
-        root.destroy()
-
-        # Retourner les valeurs récupérées
-        return width, height, humidity, population
+            # Fermer la fenêtre
+            root.destroy()
 
     root = tk.Tk()
     root.title("Map Generator")
 
     # Créer les widgets pour chaque paramètre de personnalisation
-    width_label = ttk.Label(root, text="Map Width:")
-    width_label.grid(row=0, column=0, padx=5, pady=5)
-    width_entry = ttk.Entry(root)
-    width_entry.grid(row=0, column=1, padx=5, pady=5)
+    scaleu_label = ttk.Label(root, text="Zoom(entre 10 et 100):")
+    scaleu_label.grid(row=0, column=0, padx=5, pady=5)
+    scaleu_entry = ttk.Entry(root)
+    scaleu_entry.grid(row=0, column=1, padx=5, pady=5)
 
-    height_label = ttk.Label(root, text="Map Height:")
-    height_label.grid(row=1, column=0, padx=5, pady=5)
-    height_entry = ttk.Entry(root)
-    height_entry.grid(row=1, column=1, padx=5, pady=5)
+    smooth_label = ttk.Label(root, text="Détails des bordure de biomes(entre 1 et 5):")
+    smooth_label.grid(row=1, column=0, padx=5, pady=5)
+    smooth_entry = ttk.Entry(root)
+    smooth_entry.grid(row=1, column=1, padx=5, pady=5)
 
-    humidity_label = ttk.Label(root, text="Humidity:")
-    humidity_label.grid(row=2, column=0, padx=5, pady=5)
-    humidity_scale = ttk.Scale(root, from_=0, to=100)
-    humidity_scale.grid(row=2, column=1, padx=5, pady=5)
+    generate_button = ttk.Button(root, text="Generate Map", command=lambda: on_generate_map(scale_octaves))
+    generate_button.grid(row=2, columnspan=2, padx=5, pady=5)
 
-    population_label = ttk.Label(root, text="Population:")
-    population_label.grid(row=3, column=0, padx=5, pady=5)
-    population_scale = ttk.Scale(root, from_=0, to=100)
-    population_scale.grid(row=3, column=1, padx=5, pady=5)
-
-
-    generate_button = ttk.Button(root, text="Generate Map", command=root.destroy)
-    generate_button.grid(row=4, columnspan=2, padx=5, pady=5)
+    # Initialize a list to hold scale and octaves values
+    scale_octaves = [0,0]
 
     root.mainloop()
+
+    # Return the list containing updated scale and octaves values
+    return scale_octaves
 
 
 # Fonction pr generer une map de bruit d'ambiance. (Bruit perlin)
@@ -228,22 +219,21 @@ def determine_biome(temperature_value, precipitation_value, temperature_threshol
             return (230, 255, 255)  # Tundra/Neige
 
 # Fontion pour finalement generer la carte de biomes et de méteo
-def generate_world(seed, WORLD_SIZE_X, WORLD_SIZE_Y):
+def generate_world(seed, WORLD_SIZE_X, WORLD_SIZE_Y,scale,octaves):
     # Parametres de generation de la carte
     relaxation_iterations = 10 # Nombre d'itérations de l'algo Lloyd
+    scale_int = int(scale)
+    octaves_int = int(octaves)
+
     # pour répartir uniformément les points dans le diagramme de Voronoi.
-    scale = 50 # Echelle dans la génération du bruit de Perlin
-    # Contrôle la taille des structures dans le bruit généré
-    octaves = 6 # Nombre d'octaves utilisé dans la génération du bruit de Perlin
-    # Plus d'octaves = plus les détails présents dans le bruit généré
     persistence = 0.5 # Contrôle l'influence de chaque octave sur le résultat final
     lacunarity = 2.0 # Contrôle comment la fréquence des octaves augmente à chaque octave
     temperature_thresholds = [-0.1, -0.05, 0.05, 0.1, 0.25] # Seuils de température déterminent les différentes plages de température pour les biomes
     precipitation_thresholds = [-0.2, -0.15, -0.1, 0.1, 0.25] # Pareil mais pour la percipitation
 
     # Generer Perlin noise maps pr temperature et precipitation
-    temperature_map = generate_perlin_noise_map(WORLD_SIZE_X, WORLD_SIZE_Y, scale, octaves, persistence, lacunarity, seed)
-    precipitation_map = generate_perlin_noise_map(WORLD_SIZE_X, WORLD_SIZE_Y, scale, octaves, persistence, lacunarity, seed)
+    temperature_map = generate_perlin_noise_map(WORLD_SIZE_X, WORLD_SIZE_Y, scale_int, octaves_int, persistence, lacunarity, seed)
+    precipitation_map = generate_perlin_noise_map(WORLD_SIZE_X, WORLD_SIZE_Y, scale_int, octaves_int, persistence, lacunarity, seed)
 
     # Generer motifs de meteo 
     rain_intensity, snow_intensity = generate_weather_patterns(WORLD_SIZE_X, WORLD_SIZE_Y, seed)
@@ -293,16 +283,21 @@ initialize_database()  # Ensure the database is initialized before saving the se
 WHITE = (200, 200, 255) # Neige grise un peu
 BLUE = (0, 0, 255) # Pluie bleu foncé
 
-show_map_generator()
+scale,octaves = show_map_generator() # Echelle dans la génération du bruit de Perlin
+    # Contrôle la taille des structures dans le bruit généré
+    # Nombre d'octaves utilisé dans la génération du bruit de Perlin
+    # Plus d'octaves = plus les détails présents dans le bruit généré
 
-WORLD_SIZE_X = 450 # En nombre de pixel
-WORLD_SIZE_Y = 250
+
+WORLD_SIZE_X=450
+WORLD_SIZE_Y=250
+
 CELL_SIZE = 3 # La taille des cellules Voronoi. Plus petites taille = plus de biomes et vice versa
 # Parcontre faut aussi prendre en compte la taille de la carte avec (WORLD_SIZE)
 seed = get_seed()
 screen = pygame.display.set_mode((WORLD_SIZE_X * CELL_SIZE, WORLD_SIZE_Y * CELL_SIZE))
 show_loading_screen(screen)
-biomes, rain_intensity, snow_intensity = generate_world(seed, WORLD_SIZE_X, WORLD_SIZE_Y)
+biomes, rain_intensity, snow_intensity = generate_world(seed, WORLD_SIZE_X, WORLD_SIZE_Y,scale,octaves)
 #Sauvegarder la carte dans un format choisi 
 image = Image.fromarray(biomes.astype(np.uint8))
 pygame.display.set_caption("Générateur de Carte 4.0")
