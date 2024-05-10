@@ -80,7 +80,7 @@ def show_map_generator():
             tab_personalisation[0] = scale_entry.get()
             tab_personalisation[1] = octaves_entry.get()
             tab_personalisation[2] = climate_combobox.get() #rend "aride","normal" ou "artique"
-
+            tab_personalisation[3] = pop_combobox.get()
             # Close the window
             root.destroy()
 
@@ -90,13 +90,13 @@ def show_map_generator():
     root.title("Map Generator")
 
     # Create text entry for scale
-    scale_label = ttk.Label(root, text="Taille:")
+    scale_label = ttk.Label(root, text="Taille (entre 10 et 100):")
     scale_label.grid(row=0, column=0, padx=5, pady=5)
     scale_entry = ttk.Entry(root)
     scale_entry.grid(row=0, column=1, padx=5, pady=5)
 
     # Create text entry for octaves
-    octaves_label = ttk.Label(root, text="Détails des bordure de biomes:")
+    octaves_label = ttk.Label(root, text="Détails des bordure de biomes (entre 1 et 5):")
     octaves_label.grid(row=1, column=0, padx=5, pady=5)
     octaves_entry = ttk.Entry(root)
     octaves_entry.grid(row=1, column=1, padx=5, pady=5)
@@ -118,7 +118,7 @@ def show_map_generator():
     generate_button.grid(row=4, columnspan=2, padx=5, pady=5)
 
     # Initialize a list to hold scale, octaves, and climate values
-    tab_personalisation = [scale_entry.get(), octaves_entry.get(), climate_combobox.get()]
+    tab_personalisation = [scale_entry.get(), octaves_entry.get(), climate_combobox.get(), pop_combobox.get()]
 
     root.mainloop()
     # Return the list containing updated scale, octaves, and climate values
@@ -299,7 +299,7 @@ initialize_database()  # Ensure the database is initialized before saving the se
 WHITE = (200, 200, 255) # Neige grise un peu
 BLUE = (0, 0, 255) # Pluie bleu foncé
 
-scale,octaves,climatX = show_map_generator() # Echelle dans la génération du bruit de Perlin
+scale,octaves,climatX,pop = show_map_generator() # Echelle dans la génération du bruit de Perlin
     # Contrôle la taille des structures dans le bruit généré
     # Nombre d'octaves utilisé dans la génération du bruit de Perlin
     # Plus d'octaves = plus les détails présents dans le bruit généré
