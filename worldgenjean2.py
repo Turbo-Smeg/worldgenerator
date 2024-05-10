@@ -74,39 +74,55 @@ def show_loading_screen(screen):
         pygame.time.wait(500)  # Attendre 500 millisecondes entre chaque mise à jour
 
 def show_map_generator():
-    def on_generate_map(scale_smooth):
-        if root.winfo_exists():  # Vérifier si la fenêtre existe encore
-            # Mettre à jour les valeurs dans la liste
-            scale_smooth[0] = int(scaleu_entry.get())
-            scale_smooth[1] = int(smooth_entry.get())
+    def on_generate_map(tab_personalisation):
+        if root.winfo_exists():  # Check if the window still exists
+            # Update the values in the list
+            tab_personalisation[0] = scale_entry.get()
+            tab_personalisation[1] = octaves_entry.get()
+            tab_personalisation[2] = climate_combobox.get() #rend "aride","normal" ou "artique"
 
-            # Fermer la fenêtre
+            # Close the window
             root.destroy()
+
+        # No need to return values explicitly, as they are updated in the list
 
     root = tk.Tk()
     root.title("Map Generator")
 
-    # Créer les widgets pour chaque paramètre de personnalisation
-    scaleu_label = ttk.Label(root, text="Zoom(entre 10 et 100):")
-    scaleu_label.grid(row=0, column=0, padx=5, pady=5)
-    scaleu_entry = ttk.Entry(root)
-    scaleu_entry.grid(row=0, column=1, padx=5, pady=5)
+    # Create text entry for scale
+    scale_label = ttk.Label(root, text="Taille:")
+    scale_label.grid(row=0, column=0, padx=5, pady=5)
+    scale_entry = ttk.Entry(root)
+    scale_entry.grid(row=0, column=1, padx=5, pady=5)
 
-    smooth_label = ttk.Label(root, text="Détails des bordure de biomes(entre 1 et 5):")
-    smooth_label.grid(row=1, column=0, padx=5, pady=5)
-    smooth_entry = ttk.Entry(root)
-    smooth_entry.grid(row=1, column=1, padx=5, pady=5)
+    # Create text entry for octaves
+    octaves_label = ttk.Label(root, text="Détails des bordure de biomes:")
+    octaves_label.grid(row=1, column=0, padx=5, pady=5)
+    octaves_entry = ttk.Entry(root)
+    octaves_entry.grid(row=1, column=1, padx=5, pady=5)
 
-    generate_button = ttk.Button(root, text="Generate Map", command=lambda: on_generate_map(scale_octaves))
-    generate_button.grid(row=2, columnspan=2, padx=5, pady=5)
+    # Create a combobox for climate selection
+    climate_label = ttk.Label(root, text="Climat:")
+    climate_label.grid(row=2, column=0, padx=5, pady=5)
+    climate_combobox = ttk.Combobox(root, values=["Aride", "Normal", "Arctique"])
+    climate_combobox.grid(row=2, column=1, padx=5, pady=5)
+    climate_combobox.current(1)  # Set default selection to "Normal"
 
-    # Initialize a list to hold scale and octaves values
-    scale_octaves = [0,0]
+    pop_label = ttk.Label(root, text="Population:")
+    pop_label.grid(row=3, column=0, padx=5, pady=5)
+    pop_combobox = ttk.Combobox(root, values=["Faible", "Moyen", "Peuplé"])
+    pop_combobox.grid(row=3, column=1, padx=5, pady=5)
+    pop_combobox.current(1)  # Set default selection to "Normal"
+
+    generate_button = ttk.Button(root, text="Generate Map", command=lambda: on_generate_map(tab_personalisation))
+    generate_button.grid(row=4, columnspan=2, padx=5, pady=5)
+
+    # Initialize a list to hold scale, octaves, and climate values
+    tab_personalisation = [scale_entry.get(), octaves_entry.get(), climate_combobox.get()]
 
     root.mainloop()
-
-    # Return the list containing updated scale and octaves values
-    return scale_octaves
+    # Return the list containing updated scale, octaves, and climate values
+    return tab_personalisation
 
 
 # Fonction pr generer une map de bruit d'ambiance. (Bruit perlin)
@@ -283,7 +299,7 @@ initialize_database()  # Ensure the database is initialized before saving the se
 WHITE = (200, 200, 255) # Neige grise un peu
 BLUE = (0, 0, 255) # Pluie bleu foncé
 
-scale,octaves = show_map_generator() # Echelle dans la génération du bruit de Perlin
+scale,octaves,climatX = show_map_generator() # Echelle dans la génération du bruit de Perlin
     # Contrôle la taille des structures dans le bruit généré
     # Nombre d'octaves utilisé dans la génération du bruit de Perlin
     # Plus d'octaves = plus les détails présents dans le bruit généré
