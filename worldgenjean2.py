@@ -90,7 +90,7 @@ def show_map_generator():
     root.title("Map Generator")
 
     # Create text entry for scale
-    scale_label = ttk.Label(root, text="Taille (entre 10 et 100):")
+    scale_label = ttk.Label(root, text="Zoom (entre 10 et 100):")
     scale_label.grid(row=0, column=0, padx=5, pady=5)
     scale_entry = ttk.Entry(root)
     scale_entry.grid(row=0, column=1, padx=5, pady=5)
