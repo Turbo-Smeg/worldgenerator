@@ -3,7 +3,7 @@ from scipy.spatial import Voronoi # Pour les Voronoi diagrams utilisé pour les 
 import pygame # Interface qui affiche la carte, on peut faire plein dautres choses avec
 import noise # Pour le Bruit de Perlin
 import tkinter as tk # Interface graphique (GUI) pour faire entrer le "seed"
-from tkinter import simpledialog, messagebox
+from tkinter import simpledialog, messagebox, ttk
 import sqlite3
 import os
 import hashlib
@@ -78,10 +78,7 @@ def show_loading_screen(screen):
 
 
 
-initialize_database()  # Ensure the database is initialized before saving the seed
-# Definir les couleurs pour la météo
-WHITE = (200, 200, 255) # Neige grise un peu
-BLUE = (0, 0, 255) # Pluie bleu foncé
+
 
 # Fonction pr generer une map de bruit d'ambiance. (Bruit perlin)
 # J'utilise ca comme la "base" du randomness de la carte un peu
@@ -243,6 +240,20 @@ def get_seed():
     save_seed_to_database(seed)
     return seed
 
+
+def save_map(biomes, file_format):
+    save_dir = os.path.dirname(__file__)
+    file_path = os.path.join(save_dir, "map." + file_format.lower())
+    biomes_landscape = np.transpose(biomes, axes=(1, 0, 2))
+    image = Image.fromarray(biomes_landscape.astype(np.uint8))
+    image.save(file_path)
+    messagebox.showinfo("Map Saved", f"Map saved successfully as map.{file_format}")
+
+initialize_database()  # Ensure the database is initialized before saving the seed
+# Definir les couleurs pour la météo
+WHITE = (200, 200, 255) # Neige grise un peu
+BLUE = (0, 0, 255) # Pluie bleu foncé
+
 WORLD_SIZE_X = 450 # En nombre de pixel
 WORLD_SIZE_Y = 250
 CELL_SIZE = 3 # La taille des cellules Voronoi. Plus petites taille = plus de biomes et vice versa
@@ -254,15 +265,6 @@ biomes, rain_intensity, snow_intensity = generate_world(seed, WORLD_SIZE_X, WORL
 
 #Sauvegarder la carte dans un format choisi 
 image = Image.fromarray(biomes.astype(np.uint8))
-def save_map(biomes, file_format):
-    save_dir = os.path.dirname(__file__)
-    file_path = os.path.join(save_dir, "map." + file_format.lower())
-    biomes_landscape = np.transpose(biomes, axes=(1, 0, 2))
-    image = Image.fromarray(biomes_landscape.astype(np.uint8))
-    image.save(file_path)
-    messagebox.showinfo("Map Saved", f"Map saved successfully as map.{file_format}")
-
-
 
 pygame.display.set_caption("Générateur de Carte 4.0")
 
